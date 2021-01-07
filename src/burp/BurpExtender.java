@@ -1,13 +1,10 @@
 package burp;
 
 import scanner.Executor;
-import utils.UrlUtils;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 public class BurpExtender implements burp.IBurpExtender, burp.IHttpListener
 {
@@ -25,7 +22,7 @@ public class BurpExtender implements burp.IBurpExtender, burp.IHttpListener
         stdout  = new PrintWriter(callbacks.getStdout(), true);
         stderr  = new PrintWriter(callbacks.getStderr(),true);
         helpers = callbacks.getHelpers();
-        stdout.println("0.1v - loaded");
+        stdout.println("0.1.1v - loaded");
 
         callbacks.registerHttpListener(this);
     }

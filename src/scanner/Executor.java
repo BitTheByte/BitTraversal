@@ -19,12 +19,12 @@ import static burp.BurpExtender.*;
 public class Executor {
     public static String CRLF = "\r\n";
 
-    private IHttpRequestResponse getHTTPResponse(IHttpRequestResponse basepair, String url, List<String> headers) throws IOException, NoSuchFieldException {
+    private IHttpRequestResponse getHTTPResponse(IHttpRequestResponse basepair, String url, List<String> headers) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
         StringBuilder request = new StringBuilder();
 
-        for (String line: headers){
-            if(line.contains("HTTP/")){
+        for (String line : headers) {
+            if (line.contains("HTTP/")) {
                 request.append(String.format("%s %s HTTP/1.1%s",
                         helpers.analyzeRequest(basepair).getMethod(),
                         new URL(url).getPath(),
@@ -62,13 +62,19 @@ public class Executor {
         URL baseURL = UrlUtils.clearSemiColon(UrlUtils.clearQueryParameters(requestURL));
 
         for (String mutation: Mutator.mutate(baseURL)){
-            try{
+            try {
                 IHttpRequestResponse pair = this.getHTTPResponse(messageInfo, mutation, requestInfo.getHeaders());
-                String staticMatch = Detector.staticDetection(new String(pair.getResponse(), StandardCharsets.UTF_8));
-                // String dynamicMatch = Detector.dynamicDetection(content);
-                if (staticMatch != null){
+
+                String content = new String(pair.getResponse(), StandardCharsets.UTF_8);
+                String staticMatch = Detector.staticDetection(content);
+                //String dynamicMatch = Detector.dynamicDetection(mutation, content);
+
+                if (staticMatch != null)
                     Detector.report(pair, staticMatch);
-                }
+
+                //if (dynamicMatch != null)
+                //    Detector.report(pair, dynamicMatch);
+
             }catch (Exception e){
                 stderr.println(e);
             }

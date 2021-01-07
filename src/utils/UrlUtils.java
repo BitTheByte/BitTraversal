@@ -3,18 +3,18 @@ package utils;
 import burp.IHttpRequestResponse;
 import burp.IHttpService;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.*;
-import java.util.Iterator;
 
 public class UrlUtils {
     public static String CRLF = "\r\n";
 
     public static String dumpHeaders(HttpURLConnection conn) {
         StringBuilder sb = new StringBuilder();
-        Iterator<?> it = conn.getHeaderFields().keySet().iterator();
-        while (it.hasNext()) {
-            String name = (String) it.next();
-            if(name != null){
+        for (String name : conn.getHeaderFields().keySet()) {
+            if (name != null) {
                 sb.append(name);
                 sb.append(": ");
             }
@@ -25,8 +25,20 @@ public class UrlUtils {
         return sb.toString();
     }
 
+    public static String getHTTPContent(String url) throws IOException {
+        HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder response = new StringBuilder();
+        for (String line = br.readLine(); line != null; line = br.readLine()) {
+            response.append(line).append("\n");
+        }
+        br.close();
+        conn.disconnect();
+        return response.toString();
+    }
 
-    public static  URL clearQueryParameters(URL url) throws URISyntaxException, MalformedURLException {
+
+    public static URL clearQueryParameters(URL url) throws URISyntaxException, MalformedURLException {
         URI uri = url.toURI();
         return new URI(uri.getScheme(),
                 uri.getAuthority(),
